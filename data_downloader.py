@@ -28,7 +28,7 @@ class BinanceDataDownloader:
     
     def _get_file_url(self, market_type: str, data_type: str, symbol: str, 
                      interval: str = None, year: int = None, month: int = None, 
-                     date: str = None, is_daily: bool = False) -> str:
+                     date: str = None, is_daily: bool = True) -> str:
         """构建文件下载URL"""
         market_prefix = get_market_path_prefix(market_type)
         
@@ -60,7 +60,7 @@ class BinanceDataDownloader:
     
     def _get_local_file_path(self, market_type: str, data_type: str, symbol: str,
                            interval: str = None, year: int = None, month: int = None,
-                           date: str = None, is_daily: bool = False) -> str:
+                           date: str = None, is_daily: bool = True) -> str:
         """获取本地文件路径"""
         if is_daily:
             if data_type == "klines":
@@ -107,7 +107,7 @@ class BinanceDataDownloader:
     def download_data(self, symbols: List[str], market_type: str = "spot",
                      data_type: str = "klines", interval: str = "1h",
                      start_date: str = "2020-01-01", end_date: str = None,
-                     download_monthly: bool = True, download_daily: bool = True) -> List[str]:
+                     download_monthly: bool = False, download_daily: bool = True) -> List[str]:
         """下载历史数据
         
         Args:
@@ -143,11 +143,11 @@ class BinanceDataDownloader:
                 while current_dt <= end_dt:
                     url = self._get_file_url(
                         market_type, data_type, symbol, interval,
-                        current_dt.year, current_dt.month, is_daily=False
+                        current_dt.year, current_dt.month, is_daily=True
                     )
                     local_path = self._get_local_file_path(
                         market_type, data_type, symbol, interval,
-                        current_dt.year, current_dt.month, is_daily=False
+                        current_dt.year, current_dt.month, is_daily=True
                     )
                     
                     if not os.path.exists(local_path):

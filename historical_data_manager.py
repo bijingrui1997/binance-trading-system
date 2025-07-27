@@ -26,7 +26,7 @@ class HistoricalDataManager:
     def download_data(self, symbols: Union[str, List[str]], 
                      market_type: str = "spot", data_type: str = "klines",
                      interval: str = "1h", start_date: str = "2020-01-01",
-                     end_date: str = None, download_monthly: bool = True,
+                     end_date: str = None, download_monthly: bool = False,
                      download_daily: bool = True) -> List[str]:
         """
         下载历史数据
