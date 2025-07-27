@@ -25,16 +25,16 @@ from typing import Dict, List, Optional
 
 # 导入自定义模块
 from backtest_engine import BacktestEngine, Portfolio
+from strategies import StrategyFactory
 from visualizer import BacktestVisualizer
 
 class BacktestRunner:
     """回测运行器"""
     
-    def __init__(self, use_integrated_engine=True):
+    def __init__(self):
         self.engine = BacktestEngine()
         self.visualizer = BacktestVisualizer()
         self.results = {}
-        self.use_integrated_engine = use_integrated_engine
     
     def load_data_from_csv(self, file_path: str) -> pd.DataFrame:
         """从CSV文件加载数据"""
@@ -132,56 +132,13 @@ class BacktestRunner:
         print(f"初始资金: ${initial_capital:,.2f}")
         
         # 1. 加载数据
-        if self.use_integrated_engine and not data_file:
-             # 使用集成引擎，支持自动数据下载
-             engine = IntegratedBacktestEngine(initial_capital=initial_capital)
-             
-             # 创建策略
-             strategy_params = strategy_params or {}
-             strategy = StrategyFactory.create_strategy(strategy_name, **strategy_params)
-             
-             if not strategy:
-                 raise ValueError(f"未知策略: {strategy_name}")
-             
-             print(f"策略参数: {strategy_params}")
-             
-             # 运行带自动下载的回测
-             print("\n开始执行回测（使用集成引擎）...")
-             results = engine.run_backtest_with_auto_download(
-                 symbol=symbol,
-                 strategy=strategy,
-                 start_date=start_date,
-                 end_date=end_date,
-                 initial_capital=initial_capital,
-                 interval='1h',
-                 market_type='spot'
-             )
-             
-             # 添加额外信息
-             results.update({
-                 'symbol': symbol,
-                 'strategy_name': strategy_name,
-                 'strategy_params': strategy_params,
-                 'data_file': 'auto_downloaded',
-                 'backtest_period': {
-                     'start': start_date or 'auto',
-                     'end': end_date or 'auto',
-                     'days': 'auto'
-                 }
-             })
-             
-             self.results = results
-             self.print_results_summary(results)
-             return results
-         else:
-             # 使用原始引擎
-             if data_file and os.path.exists(data_file):
-                 data = self.load_data_from_csv(data_file)
-             else:
-                 data_file = self.find_data_file(symbol)
-                 if not data_file:
-                     raise FileNotFoundError(f"未找到 {symbol} 的数据文件")
-                 data = self.load_data_from_csv(data_file)
+        if data_file and os.path.exists(data_file):
+            data = self.load_data_from_csv(data_file)
+        else:
+            data_file = self.find_data_file(symbol)
+            if not data_file:
+                raise FileNotFoundError(f"未找到 {symbol} 的数据文件")
+            data = self.load_data_from_csv(data_file)
         
         if data.empty:
             raise ValueError("数据为空")
