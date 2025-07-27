@@ -155,16 +155,85 @@ df = manager.download_and_read(
 | taker_buy_base_asset_volume | 主动买入成交量 |
 | taker_buy_quote_asset_volume | 主动买入成交额 |
 
-### 交易数据字段
-| 字段名 | 说明 |
-|--------|------|
-| trade_id | 交易ID |
-| price | 价格 |
-| quantity | 数量 |
-| quote_quantity | 成交额 |
-| timestamp | 时间戳 |
-| is_buyer_maker | 是否为买方挂单 |
-| is_best_match | 是否为最优匹配 |
+## 数据接口说明
+
+**注意：不同市场类型的数据结构存在差异，请根据具体市场类型使用对应的字段说明。**
+
+### 聚合交易数据 (Aggregate Trades)
+
+#### 现货市场 (SPOT) 和 U本位合约 (UM)
+- `agg_trade_id`: 聚合交易ID
+- `price`: 价格
+- `quantity`: 数量
+- `first_trade_id`: 第一个交易ID
+- `last_trade_id`: 最后一个交易ID
+- `transact_time`: 交易时间（微秒时间戳）
+- `is_buyer_maker`: 是否为买方挂单
+- `is_best_match`: 是否为最佳匹配（仅现货市场有此字段）
+
+#### 币本位合约 (CM)
+- `agg_trade_id`: 聚合交易ID
+- `price`: 价格
+- `quantity`: 数量
+- `first_trade_id`: 第一个交易ID
+- `last_trade_id`: 最后一个交易ID
+- `transact_time`: 交易时间（毫秒时间戳）
+- `is_buyer_maker`: 是否为买方挂单
+- **注意：币本位合约没有 `is_best_match` 字段**
+
+### 交易数据 (Trades)
+
+#### 现货市场 (SPOT) 和 U本位合约 (UM)
+- `id`: 交易ID
+- `price`: 价格
+- `qty`: 数量
+- `quote_qty`: 计价货币数量
+- `time`: 交易时间（微秒时间戳）
+- `is_buyer_maker`: 是否为买方挂单
+- `is_best_match`: 是否为最佳匹配（仅现货市场有此字段）
+
+#### 币本位合约 (CM)
+- `id`: 交易ID
+- `price`: 价格
+- `qty`: 数量（张数）
+- `base_qty`: 基础货币数量
+- `time`: 交易时间（毫秒时间戳）
+- `is_buyer_maker`: 是否为买方挂单
+- **注意：币本位合约使用 `base_qty` 而非 `quote_qty`，且没有 `is_best_match` 字段**
+
+### K线数据 (Klines)
+
+#### 现货市场 (SPOT)
+- `open_time`: 开盘时间（微秒时间戳）
+- `open`: 开盘价
+- `high`: 最高价
+- `low`: 最低价
+- `close`: 收盘价
+- `volume`: 成交量
+- `close_time`: 收盘时间（微秒时间戳）
+- `quote_volume`: 计价货币成交量
+- `count`: 成交笔数
+- `taker_buy_volume`: 主动买入成交量
+- `taker_buy_quote_volume`: 主动买入计价货币成交量
+- `ignore`: 忽略字段
+
+#### U本位合约 (UM) 和 币本位合约 (CM)
+- `open_time`: 开盘时间（毫秒时间戳）
+- `open`: 开盘价
+- `high`: 最高价
+- `low`: 最低价
+- `close`: 收盘价
+- `volume`: 成交量
+- `close_time`: 收盘时间（毫秒时间戳）
+- `quote_volume`: 计价货币成交量
+- `count`: 成交笔数
+- `taker_buy_volume`: 主动买入成交量
+- `taker_buy_quote_volume`: 主动买入计价货币成交量
+- `ignore`: 忽略字段
+
+**时间戳说明：**
+- 现货市场使用微秒时间戳（16位数字）
+- 合约市场使用毫秒时间戳（13位数字）
 
 ## 文件结构
 
