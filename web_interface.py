@@ -66,7 +66,7 @@ class WebInterface:
     """Web界面类"""
     
     def __init__(self):
-        self.runner = BacktestRunner()
+        self.runner = BacktestRunner(use_integrated_engine=True)
         self.results = None
         
         # 初始化session state
@@ -163,6 +163,14 @@ class WebInterface:
             placeholder="留空自动查找"
         )
         
+        # 引擎选择
+        st.sidebar.subheader("引擎设置")
+        use_integrated_engine = st.sidebar.checkbox(
+            "使用集成引擎",
+            value=True,
+            help="使用内置的集成回测引擎，否则使用外部引擎"
+        )
+        
         return {
             'symbol': symbol,
             'strategy_name': strategy_name,
@@ -170,7 +178,8 @@ class WebInterface:
             'initial_capital': initial_capital,
             'start_date': start_date,
             'end_date': end_date,
-            'data_file': data_file if data_file else None
+            'data_file': data_file if data_file else None,
+            'use_integrated_engine': use_integrated_engine
         }
     
     def run_backtest_ui(self, config: Dict):
@@ -183,6 +192,10 @@ class WebInterface:
                 
                 with st.spinner("正在运行回测，请稍候..."):
                     try:
+                        # 根据配置创建回测运行器
+                        use_integrated_engine = config.pop('use_integrated_engine', True)
+                        self.runner = BacktestRunner(use_integrated_engine=use_integrated_engine)
+                        
                         results = self.runner.run_backtest(**config)
                         st.session_state.backtest_results = results
                         st.session_state.backtest_running = False
